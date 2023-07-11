@@ -1,7 +1,117 @@
-h1 {
-	color: red;
+/* CSS RESET */
+
+/* makes sizing simpler */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
 }
 
-p {
-	color: blue;
+/* remove default spacing */
+/* force styling of type through styling, rather than elements */
+
+* {
+	margin: 0;
+	padding: 0;
+	font: inherit;
+}
+
+html {
+	color-scheme: dark light;
+}
+
+body {
+	min-height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+
+	padding-top: 40px;
+	font-family: "Inter", sans-serif;
+	color: #89969f;
+}
+
+img,
+picture,
+svg,
+video {
+	display: block;
+	max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+	font-family: "Space Grotesk", sans-serif;
+}
+
+/* SWITCH */
+#switch-scale {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+}
+
+#switch-scale > p {
+	padding: 16px;
+}
+
+#switch-scale p.selected {
+	background-color: #89969f;
+	color: white;
+	font-weight: 800;
+}
+
+#switch-scale p:not(.selected) {
+	border: 1px solid #89969f;
+}
+
+/* SEARCH */
+#search-location {
+	display: flex;
+	gap: 16px;
+	border-bottom: 1px solid red;
+}
+
+#forecast-container {
+	height: 20vh;
+}
+
+/* TODAY INFO */
+#today-container {
+	display: flex;
+	gap: 24px;
+}
+
+#today-img {
+	height: 30vh;
+	aspect-ratio: 1 / 1;
+}
+
+#today-date {
+	opacity: 50%;
+	font-size: 0.875rem;
+	font-weight: 700;
+}
+
+#today-condition {
+	font-size: 2rem;
+	font-weight: 700;
+}
+
+#today-temperature {
+	leading-trim: both;
+	text-edge: cap;
+	font-size: 10rem;
+	font-weight: 700;
+}
+
+#today-maxmin-temp {
+	opacity: 50%;
+	font-size: 1.5rem;
+	font-weight: 500;
 }

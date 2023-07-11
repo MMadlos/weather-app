@@ -5,21 +5,56 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Weather APP</title>
-		<!-- <link rel="stylesheet" href="styles.css" /> -->
+		<script src="https://kit.fontawesome.com/e16da9793f.js" crossorigin="anonymous"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 	</head>
 	<body>
-		<h1>HOLA</h1>
-		<h2>TEXTO RANDOM</h2>
-		<p>
-			Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores ad, quibusdam vero tenetur nam molestiae illo id officia, consectetur impedit iure
-			repellendus, veniam corrupti mollitia totam saepe voluptate. Nostrum, voluptatum!
-		</p>
+		<div id="switch-scale">
+			<p class="selected">ºC</p>
+			<p>ºF</p>
+		</div>
+		<div id="search-location">
+			<input type="text" name="searchBox" id="searchBox" />
+			<i class="fa-solid fa-location-dot"></i>
+		</div>
 
-		<p>
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem ducimus itaque asperiores fuga explicabo. Tempora laudantium modi consectetur beatae
-			labore quibusdam ducimus error fugit! Consectetur alias sapiente soluta error neque.
-		</p>
+		<div id="today-container">
+			<img src="#" alt="today image condition" id="today-img" />
+			<div id="today-data-container">
+				<p id="today-date"></p>
+				<p id="today-condition"></p>
+				<h1 id="today-temperature"></h1>
+				<p id="today-maxmin-temp"></p>
+			</div>
+		</div>
 
-		<!-- <script src="index.js"></script> -->
+		<div id="forecast-container">
+			<div id="forecast-tomorrow">
+				<p class="day"></p>
+				<img src="" alt="" />
+				<div class="max-min-container">
+					<p class="max-temp-forecast"></p>
+					<p class="min-temp-forecast"></p>
+				</div>
+			</div>
+			<div id="forecast-two-days">
+				<p class="day"></p>
+				<img src="" alt="" />
+				<div class="max-min-container">
+					<p class="max-temp-forecast"></p>
+					<p class="min-temp-forecast"></p>
+				</div>
+			</div>
+			<div id="forecast-three-days">
+				<p class="day"></p>
+				<img src="" alt="" />
+				<div class="max-min-container">
+					<p class="max-temp-forecast"></p>
+					<p class="min-temp-forecast"></p>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
