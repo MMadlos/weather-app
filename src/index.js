@@ -1,4 +1,6 @@
 import "./styles.css"
+import format from "date-fns/format"
+
 const API_KEY = "48cedf39e2884af5955112026230307"
 const CITY = "Barcelona"
 const isDataInLocalStorage = localStorage.getItem("weatherData") ? true : false
@@ -11,6 +13,11 @@ function displayWeatherApp() {
 	}
 	if (isDataInLocalStorage) {
 		const localWeatherData = JSON.parse(localStorage.getItem("weatherData"))
+
+		const { last_updated_epoch, last_updated } = localWeatherData.current
+
+		const lastUpdated = new Date(last_updated)
+
 		fetchAndAddWeatherDOM(localWeatherData)
 	}
 }
@@ -33,8 +40,28 @@ async function fetchAndAddWeatherDOM(dataFromLocal) {
 	for (let i = 1; i <= 3; i++) {
 		// In (i) days
 		const forecastInfo = getForecastWeather(i, weatherData)
-		addNextDaysForecastWeatherDOM(forecastInfo)
+		addNextDaysForecastWeatherDOM(i - 1, forecastInfo)
 	}
+}
+
+function addNextDaysForecastWeatherDOM(index, forecastWeather) {
+	const forecastInfoContainerAll = document.querySelectorAll("div.forecast-info-container")
+	const forecastContainer = forecastInfoContainerAll[index]
+
+	const dayEl = forecastContainer.querySelector(".day")
+	const imgEl = forecastContainer.querySelector(".forecast-img")
+	const maxTempEl = forecastContainer.querySelector(".max-temp-forecast")
+	const minTempEl = forecastContainer.querySelector(".min-temp-forecast")
+
+	const { date, icon, maxtemp_c, mintemp_c } = forecastWeather
+	const dateObj = new Date(date.split("-").join(", "))
+
+	const dayOfTheWeek = format(dateObj, "EEE")
+
+	dayEl.textContent = dayOfTheWeek
+	imgEl.src = icon
+	maxTempEl.textContent = maxtemp_c
+	minTempEl.textContent = mintemp_c
 }
 
 async function fetchWeatherData() {
@@ -53,15 +80,6 @@ function getCurrentWeatherInfo(weatherData) {
 	return currentWeatherInfo
 }
 
-// Check last update and location
-function getLocationAndLastUpdate(weatherData) {
-	const { name, region, country } = weatherData.location
-	const { last_updated } = weatherData.current
-
-	const info = { name, region, country, last_updated }
-	return info
-}
-
 function addCurrentWeatherDOM(currentWeatherInfo) {
 	const todayImg = document.getElementById("today-img")
 	const todayDate = document.getElementById("today-date")
@@ -70,8 +88,14 @@ function addCurrentWeatherDOM(currentWeatherInfo) {
 
 	const { last_updated, temp_c, temp_f, text, icon } = currentWeatherInfo
 
+	const [date, hour] = last_updated.split(" ")
+	const newDate = new Date(date.split("-").join(", "))
+	const dateFormatted = format(newDate, "EEEE, LLLL d")
+	console.log({ date, hour })
+	console.log(dateFormatted)
+
 	todayImg.src = icon
-	todayDate.textContent = last_updated
+	todayDate.textContent = `Today, ${dateFormatted} (last update: ${hour} h)`
 	todayCondition.textContent = text
 	todayTemperature.textContent = `${temp_c}º`
 }
@@ -95,23 +119,6 @@ function addForecastWeatherTodayDOM(forecastWeather) {
 	todayMaxMinTemp.textContent = `Max ${maxtemp_c}º - Min ${mintemp_c}º`
 }
 
-function addNextDaysForecastWeatherDOM(forecastWeather) {
-	const forecastInfoContainerAll = document.querySelectorAll("div.forecast-info-container")
-	forecastInfoContainerAll.forEach((element) => {
-		const dayEl = element.querySelector(".day")
-		const imgEl = element.querySelector(".forecast-img")
-		const maxTempEl = element.querySelector(".max-temp-forecast")
-		const minTempEl = element.querySelector(".min-temp-forecast")
-
-		const { date, icon, maxtemp_c, mintemp_c } = forecastWeather
-
-		dayEl.textContent = date
-		imgEl.src = icon
-		maxTempEl.textContent = maxtemp_c
-		minTempEl.textContent = mintemp_c
-	})
-}
-
 // // CURRENT CODE
 
 // checkLastUpdated()
@@ -122,12 +129,5 @@ function addNextDaysForecastWeatherDOM(forecastWeather) {
 // 	if (lastUpdated === currentLastUpdated) console.log("YES")
 // }
 
-// async function getForecast() {
-// 	const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${CITY}&days=7&aqi=no&alerts=no`, { mode: "cors" })
-// 	const data = await response.json()
-
-// const { name, region, country } = weatherData.location
-
-// // DOM for today
 // const input = document.getElementById("searchBox")
 // input.value = `${name}, ${region}, ${country}`
