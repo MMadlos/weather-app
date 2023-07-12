@@ -115,3 +115,43 @@ h3 {
 	font-size: 1.5rem;
 	font-weight: 500;
 }
+
+/* FORECAST */
+
+#forecast-container {
+	display: flex;
+	gap: 1.5rem;
+	align-items: center;
+	padding-bottom: 120px;
+}
+
+.forecast-info-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 16px;
+}
+
+p.day {
+	font-size: 1.125rem;
+	font-weight: 700;
+}
+
+.forecast-img {
+	width: 3.75rem;
+	height: 3.75rem;
+}
+
+.max-min-container {
+	display: flex;
+	gap: 8px;
+}
+
+.max-min-container > p:first-child {
+	font-weight: 500;
+}
+
+.max-min-container > p:not(:first-child) {
+	opacity: 50%;
+}
