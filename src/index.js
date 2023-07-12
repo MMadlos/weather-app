@@ -1,11 +1,13 @@
 import "./styles.css"
 import format from "date-fns/format"
+import differenceInMinutes from "date-fns/differenceInMinutes"
 
 const API_KEY = "48cedf39e2884af5955112026230307"
 const CITY = "Barcelona"
 const isDataInLocalStorage = localStorage.getItem("weatherData") ? true : false
 
 displayWeatherApp()
+
 function displayWeatherApp() {
 	if (!isDataInLocalStorage) {
 		fetchAndAddWeatherDOM()
@@ -13,12 +15,20 @@ function displayWeatherApp() {
 	}
 	if (isDataInLocalStorage) {
 		const localWeatherData = JSON.parse(localStorage.getItem("weatherData"))
+		console.log(localWeatherData)
 
-		const { last_updated_epoch, last_updated } = localWeatherData.current
+		const { last_updated } = localWeatherData.current
+		const [date, hour] = last_updated.split(" ")
+		const lastUpdate = new Date(`${date}T${hour}`)
+		const now = new Date()
 
-		const lastUpdated = new Date(last_updated)
+		const minutesBetween = differenceInMinutes(now, lastUpdate)
 
-		fetchAndAddWeatherDOM(localWeatherData)
+		if (minutesBetween < 15) fetchAndAddWeatherDOM(localWeatherData)
+		if (minutesBetween >= 15) {
+			fetchAndAddWeatherDOM()
+			addToLocalStorage()
+		}
 	}
 }
 
@@ -67,7 +77,6 @@ function addNextDaysForecastWeatherDOM(index, forecastWeather) {
 async function fetchWeatherData() {
 	const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${CITY}&days=7&aqi=no&alerts=no`, { mode: "cors" })
 	const weatherData = await response.json()
-	console.log(weatherData)
 	return weatherData
 }
 
@@ -91,8 +100,6 @@ function addCurrentWeatherDOM(currentWeatherInfo) {
 	const [date, hour] = last_updated.split(" ")
 	const newDate = new Date(date.split("-").join(", "))
 	const dateFormatted = format(newDate, "EEEE, LLLL d")
-	console.log({ date, hour })
-	console.log(dateFormatted)
 
 	todayImg.src = icon
 	todayDate.textContent = `Today, ${dateFormatted} (last update: ${hour} h)`
