@@ -1,6 +1,6 @@
 import "./styles.css"
-import differenceInMinutes from "date-fns/differenceInMinutes"
 import { addForecastWeatherTodayDOM, addCurrentWeatherDOM, setLocationToSearchBox, addNextDaysForecastWeatherDOM } from "./DOM"
+import { getLocalStorage, addToLocalStorage, checkLocalStorageConditions } from "./localStorage"
 
 const input = document.getElementById("searchbox")
 const btnSearch = document.getElementById("btn-search")
@@ -18,35 +18,9 @@ function searchBoxEventListener() {
 	return "Barcelona"
 }
 
-displayWeatherApp()
-function displayWeatherApp() {
-	const isDataInLocalStorage = localStorage.getItem("weatherData") ? true : false
-
-	if (!isDataInLocalStorage) fetchAndPrintWeather()
-	if (isDataInLocalStorage) {
-		const localWeatherData = JSON.parse(localStorage.getItem("weatherData"))
-		console.log(localWeatherData)
-
-		const { last_updated } = localWeatherData.current
-		const [date, hour] = last_updated.split(" ")
-		const lastUpdate = new Date(`${date}T${hour}`)
-		const now = new Date()
-
-		const minutesBetween = differenceInMinutes(now, lastUpdate)
-
-		if (minutesBetween < 15) fetchAndPrintWeather(localWeatherData)
-		if (minutesBetween >= 15) {
-			fetchAndPrintWeather()
-		}
-	}
-}
-
-function addToLocalStorage(weatherData) {
-	localStorage.setItem("weatherData", JSON.stringify(weatherData))
-}
-
-async function fetchAndPrintWeather(dataFromLocal) {
-	const weatherData = dataFromLocal ? dataFromLocal : await fetchWeatherData()
+fetchAndPrintWeather()
+async function fetchAndPrintWeather() {
+	const weatherData = checkLocalStorageConditions() ? getLocalStorage() : await fetchWeatherData()
 
 	const locationData = getLocationData(weatherData)
 	const currentWeatherInfo = getCurrentWeatherInfo(weatherData)
@@ -55,18 +29,15 @@ async function fetchAndPrintWeather(dataFromLocal) {
 	setLocationToSearchBox(locationData)
 	addCurrentWeatherDOM(currentWeatherInfo)
 	addForecastWeatherTodayDOM(forecastToday)
-	getAndPrintForecast(weatherData)
 
-	addToLocalStorage(weatherData)
-}
-
-function getAndPrintForecast(weatherData) {
 	const numberOfDaysToForecast = 3
 	for (let i = 1; i <= numberOfDaysToForecast; i++) {
 		// In (i) days
 		const forecastInfo = getForecastWeather(i, weatherData)
 		addNextDaysForecastWeatherDOM(i - 1, forecastInfo)
 	}
+
+	if (!checkLocalStorageConditions) addToLocalStorage(weatherData)
 }
 
 async function fetchWeatherData() {
