@@ -1,28 +1,28 @@
 import "./styles.css"
-import format from "date-fns/format"
 import differenceInMinutes from "date-fns/differenceInMinutes"
+import { addForecastWeatherTodayDOM, addCurrentWeatherDOM, setLocationToSearchBox, addNextDaysForecastWeatherDOM } from "./DOM"
+
+const input = document.getElementById("searchbox")
+const btnSearch = document.getElementById("btn-search")
 
 const API_KEY = "48cedf39e2884af5955112026230307"
-const CITY = "Barcelona"
-const isDataInLocalStorage = localStorage.getItem("weatherData") ? true : false
-
-function getCityFromSearchBox() {
-	const input = document.getElementById("searchbox")
-	return input.value
-}
+const CITY = searchBoxEventListener()
 
 function searchBoxEventListener() {
-	const input = document.getElementById("searchbox")
-	// OPCIONES
-	// Cuando esté tecleando, espera unos milisegundos antes de hacer la búsqueda
-	// Busca después de hacer enter o click
-	// Busca localización del pc
+	btnSearch.addEventListener("click", () => input.value)
+
+	input.addEventListener("keydown", (e) => {
+		if (e.key !== "Enter") return
+		return input.value
+	})
+	return "Barcelona"
 }
 
 displayWeatherApp()
-
 function displayWeatherApp() {
-	if (!isDataInLocalStorage) fetchAndAddWeatherDOM()
+	const isDataInLocalStorage = localStorage.getItem("weatherData") ? true : false
+
+	if (!isDataInLocalStorage) fetchAndPrintWeather()
 	if (isDataInLocalStorage) {
 		const localWeatherData = JSON.parse(localStorage.getItem("weatherData"))
 		console.log(localWeatherData)
@@ -34,9 +34,9 @@ function displayWeatherApp() {
 
 		const minutesBetween = differenceInMinutes(now, lastUpdate)
 
-		if (minutesBetween < 15) fetchAndAddWeatherDOM(localWeatherData)
+		if (minutesBetween < 15) fetchAndPrintWeather(localWeatherData)
 		if (minutesBetween >= 15) {
-			fetchAndAddWeatherDOM()
+			fetchAndPrintWeather()
 		}
 	}
 }
@@ -45,11 +45,9 @@ function addToLocalStorage(weatherData) {
 	localStorage.setItem("weatherData", JSON.stringify(weatherData))
 }
 
-async function fetchAndAddWeatherDOM(dataFromLocal) {
+async function fetchAndPrintWeather(dataFromLocal) {
 	const weatherData = dataFromLocal ? dataFromLocal : await fetchWeatherData()
-	addToLocalStorage(weatherData)
 
-	console.log(weatherData)
 	const locationData = getLocationData(weatherData)
 	const currentWeatherInfo = getCurrentWeatherInfo(weatherData)
 	const forecastToday = getForecastWeather(0, weatherData)
@@ -57,9 +55,14 @@ async function fetchAndAddWeatherDOM(dataFromLocal) {
 	setLocationToSearchBox(locationData)
 	addCurrentWeatherDOM(currentWeatherInfo)
 	addForecastWeatherTodayDOM(forecastToday)
+	getAndPrintForecast(weatherData)
 
-	// For the next 3 days
-	for (let i = 1; i <= 3; i++) {
+	addToLocalStorage(weatherData)
+}
+
+function getAndPrintForecast(weatherData) {
+	const numberOfDaysToForecast = 3
+	for (let i = 1; i <= numberOfDaysToForecast; i++) {
 		// In (i) days
 		const forecastInfo = getForecastWeather(i, weatherData)
 		addNextDaysForecastWeatherDOM(i - 1, forecastInfo)
@@ -72,37 +75,9 @@ async function fetchWeatherData() {
 	return weatherData
 }
 
-function addNextDaysForecastWeatherDOM(index, forecastWeather) {
-	const forecastInfoContainerAll = document.querySelectorAll("div.forecast-info-container")
-	const forecastContainer = forecastInfoContainerAll[index]
-
-	const dayEl = forecastContainer.querySelector(".day")
-	const imgEl = forecastContainer.querySelector(".forecast-img")
-	const maxTempEl = forecastContainer.querySelector(".max-temp-forecast")
-	const minTempEl = forecastContainer.querySelector(".min-temp-forecast")
-
-	const { date, icon, maxtemp_c, mintemp_c } = forecastWeather
-	const dateObj = new Date(date.split("-").join(", "))
-
-	const dayOfTheWeek = format(dateObj, "EEE")
-
-	dayEl.textContent = dayOfTheWeek
-	imgEl.src = icon
-	maxTempEl.textContent = maxtemp_c
-	minTempEl.textContent = mintemp_c
-}
-
 function getLocationData(weatherData) {
 	const { name, region, country } = weatherData.location
-	const locationData = { name, region, country }
-	return locationData
-}
-
-function setLocationToSearchBox(locationData) {
-	const input = document.getElementById("searchbox")
-	const { name, region, country } = locationData
-
-	input.value = `${name}, ${region}, ${country}`
+	return { name, region, country }
 }
 
 function getCurrentWeatherInfo(weatherData) {
@@ -110,43 +85,15 @@ function getCurrentWeatherInfo(weatherData) {
 	const { last_updated, temp_c, temp_f } = data
 	const { text, icon } = data.condition
 
-	const currentWeatherInfo = { last_updated, temp_c, temp_f, text, icon }
-	return currentWeatherInfo
-}
-
-function addCurrentWeatherDOM(currentWeatherInfo) {
-	const todayImg = document.getElementById("today-img")
-	const todayDate = document.getElementById("today-date")
-	const todayCondition = document.getElementById("today-condition")
-	const todayTemperature = document.getElementById("today-temperature")
-
-	const { last_updated, temp_c, temp_f, text, icon } = currentWeatherInfo
-
-	const [date, hour] = last_updated.split(" ")
-	const newDate = new Date(date.split("-").join(", "))
-	const dateFormatted = format(newDate, "EEEE, LLLL d")
-
-	todayImg.src = icon
-	todayDate.textContent = `Today, ${dateFormatted} (last update: ${hour} h)`
-	todayCondition.textContent = text
-	todayTemperature.textContent = `${temp_c}º`
+	return { last_updated, temp_c, temp_f, text, icon }
 }
 
 function getForecastWeather(dayIndex, weatherData) {
-	//dayIndex is the position of the day in the array. Today = 0, Tomorrow = 1, the day after tomorrow = 2, etc.
-	const { date, date_epoch } = weatherData.forecast.forecastday[dayIndex]
-	const { maxtemp_c, maxtemp_f, mintemp_c, mintemp_f } = weatherData.forecast.forecastday[dayIndex].day
-	const { icon, text } = weatherData.forecast.forecastday[dayIndex].day.condition
+	//dayIndex -> Today = 0, Tomorrow = 1, the day after tomorrow = 2, etc.
+	const forecastDay = weatherData.forecast.forecastday[dayIndex]
+	const { date, date_epoch } = forecastDay
+	const { maxtemp_c, maxtemp_f, mintemp_c, mintemp_f } = forecastDay.day
+	const { icon, text } = forecastDay.day.condition
 
-	const forecastWeather = { date, date_epoch, maxtemp_c, maxtemp_f, mintemp_c, mintemp_f, icon, text }
-
-	return forecastWeather
-}
-
-function addForecastWeatherTodayDOM(forecastWeather) {
-	const todayMaxMinTemp = document.getElementById("today-maxmin-temp")
-
-	const { maxtemp_c, maxtemp_f, mintemp_c, mintemp_f } = forecastWeather
-
-	todayMaxMinTemp.textContent = `Max ${maxtemp_c}º - Min ${mintemp_c}º`
+	return { date, date_epoch, maxtemp_c, maxtemp_f, mintemp_c, mintemp_f, icon, text }
 }

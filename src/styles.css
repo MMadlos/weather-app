@@ -80,14 +80,12 @@ header {
 	font-weight: 600;
 
 	border-radius: 7px 0 0 7px;
-	border-top: 2px solid #dee7ee;
-	border-bottom: 2px solid #dee7ee;
-	border-left: 2px solid #dee7ee;
+	border: 2px solid #dee7ee;
+	border-right: none;
 	background: #fff;
 }
 
-#searchbox:hover,
-#searchbox:focus {
+#searchbox:hover:not(:focus) {
 	opacity: 50%;
 }
 
