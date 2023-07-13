@@ -6,13 +6,23 @@ const API_KEY = "48cedf39e2884af5955112026230307"
 const CITY = "Barcelona"
 const isDataInLocalStorage = localStorage.getItem("weatherData") ? true : false
 
+function getCityFromSearchBox() {
+	const input = document.getElementById("searchbox")
+	return input.value
+}
+
+function searchBoxEventListener() {
+	const input = document.getElementById("searchbox")
+	// OPCIONES
+	// Cuando esté tecleando, espera unos milisegundos antes de hacer la búsqueda
+	// Busca después de hacer enter o click
+	// Busca localización del pc
+}
+
 displayWeatherApp()
 
 function displayWeatherApp() {
-	if (!isDataInLocalStorage) {
-		fetchAndAddWeatherDOM()
-		addToLocalStorage()
-	}
+	if (!isDataInLocalStorage) fetchAndAddWeatherDOM()
 	if (isDataInLocalStorage) {
 		const localWeatherData = JSON.parse(localStorage.getItem("weatherData"))
 		console.log(localWeatherData)
@@ -27,22 +37,24 @@ function displayWeatherApp() {
 		if (minutesBetween < 15) fetchAndAddWeatherDOM(localWeatherData)
 		if (minutesBetween >= 15) {
 			fetchAndAddWeatherDOM()
-			addToLocalStorage()
 		}
 	}
 }
 
-async function addToLocalStorage() {
-	const weatherData = await fetchWeatherData()
+function addToLocalStorage(weatherData) {
 	localStorage.setItem("weatherData", JSON.stringify(weatherData))
 }
 
 async function fetchAndAddWeatherDOM(dataFromLocal) {
 	const weatherData = dataFromLocal ? dataFromLocal : await fetchWeatherData()
+	addToLocalStorage(weatherData)
 
+	console.log(weatherData)
+	const locationData = getLocationData(weatherData)
 	const currentWeatherInfo = getCurrentWeatherInfo(weatherData)
 	const forecastToday = getForecastWeather(0, weatherData)
 
+	setLocationToSearchBox(locationData)
 	addCurrentWeatherDOM(currentWeatherInfo)
 	addForecastWeatherTodayDOM(forecastToday)
 
@@ -52,6 +64,12 @@ async function fetchAndAddWeatherDOM(dataFromLocal) {
 		const forecastInfo = getForecastWeather(i, weatherData)
 		addNextDaysForecastWeatherDOM(i - 1, forecastInfo)
 	}
+}
+
+async function fetchWeatherData() {
+	const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${CITY}&days=7&aqi=no&alerts=no`, { mode: "cors" })
+	const weatherData = await response.json()
+	return weatherData
 }
 
 function addNextDaysForecastWeatherDOM(index, forecastWeather) {
@@ -74,10 +92,17 @@ function addNextDaysForecastWeatherDOM(index, forecastWeather) {
 	minTempEl.textContent = mintemp_c
 }
 
-async function fetchWeatherData() {
-	const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${CITY}&days=7&aqi=no&alerts=no`, { mode: "cors" })
-	const weatherData = await response.json()
-	return weatherData
+function getLocationData(weatherData) {
+	const { name, region, country } = weatherData.location
+	const locationData = { name, region, country }
+	return locationData
+}
+
+function setLocationToSearchBox(locationData) {
+	const input = document.getElementById("searchbox")
+	const { name, region, country } = locationData
+
+	input.value = `${name}, ${region}, ${country}`
 }
 
 function getCurrentWeatherInfo(weatherData) {
@@ -125,16 +150,3 @@ function addForecastWeatherTodayDOM(forecastWeather) {
 
 	todayMaxMinTemp.textContent = `Max ${maxtemp_c}º - Min ${mintemp_c}º`
 }
-
-// // CURRENT CODE
-
-// checkLastUpdated()
-// async function checkLastUpdated() {
-// 	const currentLastUpdated = await getLastUpdate()
-
-// 	if (lastUpdated !== currentLastUpdated) console.log({ lastUpdated, currentLastUpdated })
-// 	if (lastUpdated === currentLastUpdated) console.log("YES")
-// }
-
-// const input = document.getElementById("searchBox")
-// input.value = `${name}, ${region}, ${country}`

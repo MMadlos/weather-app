@@ -11,18 +11,26 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 	</head>
 	<body>
-		<div id="switch-scale">
-			<p class="selected">ºC</p>
-			<p>ºF</p>
-		</div>
-		<div id="search-location">
-			<input type="text" name="searchBox" id="searchBox" />
-			<i class="fa-solid fa-location-dot"></i>
-		</div>
+		<header>
+			<h2 id="logo">Weather App</h2>
+
+			<div id="search-container">
+				<div id="search-location">
+					<i class="fa-solid fa-location-dot"></i>
+					<input type="text" name="searchbox" id="searchbox" />
+				</div>
+				<button id="btn-search">Search</button>
+			</div>
+			<div id="switch-scale">
+				<p class="selected">ºC</p>
+				<p>ºF</p>
+			</div>
+		</header>
 
 		<div id="today-container">
 			<img src="#" alt="today image condition" id="today-img" />
 			<div id="today-data-container">
+				<p id="city"></p>
 				<p id="today-condition"></p>
 				<p id="today-date"></p>
 				<h1 id="today-temperature"></h1>

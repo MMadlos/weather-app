@@ -48,37 +48,111 @@ h3 {
 	font-family: "Space Grotesk", sans-serif;
 }
 
+/* HEADER */
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	width: 100%;
+	padding: 0 40px 0 40px;
+}
+
+#logo {
+	font-family: Space Grotesk;
+	font-size: 2rem;
+	font-weight: 700;
+	letter-spacing: -0.11rem;
+}
+
+/* SEARCH */
+#search-container {
+	display: flex;
+	width: 30vw;
+}
+#search-location {
+	display: flex;
+	gap: 16px;
+	padding: 8px 16px;
+	width: 100%;
+
+	font-size: 1.125rem;
+	font-weight: 600;
+
+	border-radius: 7px 0 0 7px;
+	border-top: 2px solid #dee7ee;
+	border-bottom: 2px solid #dee7ee;
+	border-left: 2px solid #dee7ee;
+	background: #fff;
+}
+
+#searchbox:hover,
+#searchbox:focus {
+	opacity: 50%;
+}
+
+#searchbox {
+	outline: none;
+	border: none;
+	color: #89969f;
+	font-weight: 500;
+}
+
+.fa-location-dot {
+	color: #b8c5d0;
+	width: 18px;
+	height: 18px;
+	padding-right: 8px;
+}
+
+#btn-search {
+	padding: 8px 32px;
+	background-color: #89969f;
+	color: #fff;
+	outline: none;
+	border: none;
+	border-radius: 0 7px 7px 0;
+
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+
+#btn-search:hover {
+	opacity: 50%;
+}
+
 /* SWITCH */
 #switch-scale {
-	position: absolute;
-	top: 0;
-	left: 0;
 	display: flex;
 }
 
 #switch-scale > p {
-	padding: 16px;
+	padding: 8px 32px;
+	font-weight: 700;
+}
+
+#switch-scale > p:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+#switch-scale > p:last-of-type {
+	border-radius: 0 4px 4px 0;
 }
 
 #switch-scale p.selected {
 	background-color: #89969f;
 	color: white;
-	font-weight: 800;
+	font-size: 1.125rem;
 }
 
 #switch-scale p:not(.selected) {
 	border: 1px solid #89969f;
 }
 
-/* SEARCH */
-#search-location {
-	display: flex;
-	gap: 16px;
-	border-bottom: 1px solid red;
-}
-
-#forecast-container {
-	height: 20vh;
+#switch-scale p:not(.selected):hover {
+	background-color: #89969f;
+	opacity: 50%;
+	color: #fff;
 }
 
 /* TODAY INFO */
@@ -119,8 +193,9 @@ h3 {
 /* FORECAST */
 
 #forecast-container {
+	height: 20vh;
 	display: flex;
-	gap: 1.5rem;
+	gap: 40px;
 	align-items: center;
 	padding-bottom: 120px;
 }
@@ -130,7 +205,7 @@ h3 {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	gap: 16px;
+	gap: 8px;
 }
 
 p.day {
