@@ -1,48 +1,105 @@
 import "./styles.css"
-import { addForecastWeatherTodayDOM, addCurrentWeatherDOM, setLocationToSearchBox, addNextDaysForecastWeatherDOM } from "./DOM"
-import { getLocalStorage, addToLocalStorage, checkLocalStorageConditions } from "./localStorage"
-
-const input = document.getElementById("searchbox")
-const btnSearch = document.getElementById("btn-search")
+import {
+	addForecastWeatherTodayDOM,
+	addCurrentWeatherDOM,
+	setLocationToSearchBox,
+	addNextDaysForecastWeatherDOM,
+	displayLoading,
+	hideLoading,
+	hideData,
+	displayData,
+} from "./DOM"
+import { getLocalStorage, addToLocalStorage, checkLocalStorageConditions, getPreviouslocationLocalStorage } from "./localStorage"
 
 const API_KEY = "48cedf39e2884af5955112026230307"
-const CITY = searchBoxEventListener()
+const defaultLocation = getPreviouslocationLocalStorage() || "Barcelona, Catalonia"
+const defaultScale = getScaleSelected()
+
+printWeather(defaultLocation, defaultScale)
+
+function printWeather(location, tempScale) {
+	fetchAndPrintWeather(location, tempScale)
+	searchBoxEventListener()
+	toggleScale()
+}
+
+function toggleScale() {
+	const switchScale = document.getElementById("switch-scale")
+	const selectedScale = switchScale.querySelector(".selected")
+	const notSelectedScale = switchScale.querySelector("p:not(.selected)")
+
+	notSelectedScale.addEventListener("click", () => {
+		selectedScale.classList.remove("selected")
+		notSelectedScale.classList.add("selected")
+
+		const currentLocation = document.getElementById("searchbox").value
+		const scaleClicked = getScaleSelected()
+
+		printWeather(currentLocation, scaleClicked)
+	})
+}
+
+function getScaleSelected() {
+	const switchScale = document.getElementById("switch-scale")
+	const getSelected = switchScale.querySelector(".selected")
+	return getSelected.textContent.charAt(1)
+}
 
 function searchBoxEventListener() {
-	btnSearch.addEventListener("click", () => input.value)
+	const input = document.getElementById("searchbox")
+	const btnSearch = document.getElementById("btn-search")
+
+	btnSearch.addEventListener("click", () => {
+		if (input.value === "") return
+		const location = input.value
+		input.blur()
+
+		fetchAndPrintWeather(location, getScaleSelected())
+	})
 
 	input.addEventListener("keydown", (e) => {
 		if (e.key !== "Enter") return
-		return input.value
+		const location = input.value
+		input.blur()
+
+		fetchAndPrintWeather(location, getScaleSelected())
 	})
-	return "Barcelona"
 }
 
-fetchAndPrintWeather()
-async function fetchAndPrintWeather() {
-	const weatherData = checkLocalStorageConditions() ? getLocalStorage() : await fetchWeatherData()
+async function fetchAndPrintWeather(location, tempScale) {
+	displayLoading()
+	hideData()
+
+	const weatherData = checkLocalStorageConditions(location) ? getLocalStorage() : await fetchWeatherData(location)
 
 	const locationData = getLocationData(weatherData)
 	const currentWeatherInfo = getCurrentWeatherInfo(weatherData)
 	const forecastToday = getForecastWeather(0, weatherData)
 
 	setLocationToSearchBox(locationData)
-	addCurrentWeatherDOM(currentWeatherInfo)
-	addForecastWeatherTodayDOM(forecastToday)
+	addCurrentWeatherDOM(currentWeatherInfo, tempScale)
+	addForecastWeatherTodayDOM(forecastToday, tempScale)
 
 	const numberOfDaysToForecast = 3
 	for (let i = 1; i <= numberOfDaysToForecast; i++) {
 		// In (i) days
 		const forecastInfo = getForecastWeather(i, weatherData)
-		addNextDaysForecastWeatherDOM(i - 1, forecastInfo)
+		addNextDaysForecastWeatherDOM(i - 1, forecastInfo, tempScale)
 	}
 
-	if (!checkLocalStorageConditions) addToLocalStorage(weatherData)
+	setTimeout(() => {
+		hideLoading()
+		displayData()
+	}, 2500)
+
+	console.log(checkLocalStorageConditions(location))
+	if (!checkLocalStorageConditions(location)) addToLocalStorage(weatherData)
 }
 
-async function fetchWeatherData() {
-	const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${CITY}&days=7&aqi=no&alerts=no`, { mode: "cors" })
+async function fetchWeatherData(location) {
+	const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${location}&days=7&aqi=no&alerts=no`, { mode: "cors" })
 	const weatherData = await response.json()
+
 	return weatherData
 }
 

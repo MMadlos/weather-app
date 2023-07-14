@@ -85,7 +85,11 @@ header {
 	background: #fff;
 }
 
-#searchbox:hover:not(:focus) {
+#searchbox:hover {
+	opacity: 50%;
+}
+
+#searchbox::placeholder {
 	opacity: 50%;
 }
 
@@ -154,9 +158,15 @@ header {
 }
 
 /* TODAY INFO */
+#city {
+	font-weight: 500;
+}
+
 #today-container {
 	display: flex;
 	gap: 24px;
+	align-items: center;
+	flex-grow: 1;
 }
 
 #today-img {
@@ -179,7 +189,7 @@ header {
 	leading-trim: both;
 	text-edge: cap;
 	font-size: 10rem;
-	font-weight: 700;
+	font-weight: 800;
 }
 
 #today-maxmin-temp {
@@ -227,4 +237,29 @@ p.day {
 
 .max-min-container > p:not(:first-child) {
 	opacity: 50%;
+}
+
+/* LOADING ANIMATION */
+
+#loading {
+	width: 12rem;
+	height: 12rem;
+	border: 24px solid #f3f3f3;
+	border-top: 24px solid #9c41f2;
+	border-radius: 100%;
+	margin: auto;
+	animation: spin 1.5s infinite linear;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.hide {
+	display: none !important;
 }
